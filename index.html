@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .quiz-container {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .option {
+            background-color: #e0e0e0;
+        }
+        .option:hover {
+            background-color: #d0d0d0;
+        }
+        .next {
+            background-color: #4CAF50;
+            color: white;
+            margin-top: 20px;
+        }
+        .score {
+            font-size: 18px;
+            margin: 20px 0;
+        }
+        .feedback {
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .correct {
+            color: #4CAF50;
+        }
+        .incorrect {
+            color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <h1>¡Aprende Español! - Spanish Grammar Quiz</h1>
+    <div class="score">Score: <span id="score">0</span></div>
+    <div class="quiz-container">
+        <div id="question"></div>
+        <div class="options" id="options"></div>
+        <div id="feedback" class="feedback"></div>
+        <button class="next" id="next" style="display: none;">Next Question</button>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "Choose the correct article for 'mesa' (table):",
+                options: ["el", "la", "los", "las"],
+                correct: "la",
+                explanation: "'Mesa' is a feminine noun, so it uses 'la'"
+            },
+            {
+                question: "Complete: 'Yo _____ agua' (I drink water)",
+                options: ["bebo", "bebes", "bebe", "beben"],
+                correct: "bebo",
+                explanation: "With 'yo' (I), we use the '-o' ending"
+            },
+            {
+                question: "Choose the correct article for 'libros' (books):",
+                options: ["el", "la", "los", "las"],
+                correct: "los",
+                explanation: "'Libros' is masculine plural, so it uses 'los'"
+            },
+            {
+                question: "Complete: 'Tú _____ español' (You speak Spanish)",
+                options: ["hablo", "hablas", "habla", "hablan"],
+                correct: "hablas",
+                explanation: "With 'tú' (you), we use the '-as' ending"
+            },
+            {
+                question: "Choose the correct article for 'estudiante' (student):",
+                options: ["el", "la", "los", "las"],
+                correct: "el",
+                explanation: "'Estudiante' is masculine, so it uses 'el'"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        const questionElement = document.getElementById('question');
+        const optionsElement = document.getElementById('options');
+        const feedbackElement = document.getElementById('feedback');
+        const nextButton = document.getElementById('next');
+        const scoreElement = document.getElementById('score');
+
+        function showQuestion() {
+            const question = questions[currentQuestion];
+            questionElement.textContent = question.question;
+            optionsElement.innerHTML = '';
+            feedbackElement.innerHTML = '';
+            nextButton.style.display = 'none';
+
+            question.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.className = 'option';
+                button.addEventListener('click', () => checkAnswer(option));
+                optionsElement.appendChild(button);
+            });
+        }
+
+        function checkAnswer(selected) {
+            const question = questions[currentQuestion];
+            const isCorrect = selected === question.correct;
+            
+            // Disable all options
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                option.disabled = true;
+                if (option.textContent === question.correct) {
+                    option.style.backgroundColor = '#4CAF50';
+                    option.style.color = 'white';
+                } else if (option.textContent === selected && !isCorrect) {
+                    option.style.backgroundColor = '#f44336';
+                    option.style.color = 'white';
+                }
+            });
+
+            // Show feedback
+            feedbackElement.textContent = isCorrect ? 
+                '¡Correcto! ' + question.explanation :
+                '¡Incorrecto! ' + question.explanation;
+            feedbackElement.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
+
+            if (isCorrect) {
+                score++;
+                scoreElement.textContent = score;
+            }
+
+            nextButton.style.display = 'inline-block';
+        }
+
+        nextButton.addEventListener('click', () => {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                showQuestion();
+            } else {
+                questionElement.textContent = `¡Felicitaciones! Quiz completed. Final score: ${score}/${questions.length}`;
+                optionsElement.innerHTML = '';
+                feedbackElement.innerHTML = '';
+                nextButton.style.display = 'none';
+            }
+        });
+
+        // Start the quiz
+        showQuestion();
+    </script>
+</body>
+</html>
