@@ -53,11 +53,16 @@
         .incorrect {
             color: #f44336;
         }
+        .progress {
+            margin-top: 10px;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
     <h1>¡Aprende Español! - Spanish Grammar Quiz</h1>
     <div class="score">Score: <span id="score">0</span></div>
+    <div class="progress">Question: <span id="current">1</span>/<span id="total">0</span></div>
     <div class="quiz-container">
         <div id="question"></div>
         <div class="options" id="options"></div>
@@ -362,6 +367,11 @@
         const feedbackElement = document.getElementById('feedback');
         const nextButton = document.getElementById('next');
         const scoreElement = document.getElementById('score');
+        const currentQuestionElement = document.getElementById('current');
+        const totalQuestionsElement = document.getElementById('total');
+
+        // Initialize total questions count
+        totalQuestionsElement.textContent = questions.length;
 
         function showQuestion() {
             const question = questions[currentQuestion];
@@ -369,6 +379,7 @@
             optionsElement.innerHTML = '';
             feedbackElement.innerHTML = '';
             nextButton.style.display = 'none';
+            currentQuestionElement.textContent = currentQuestion + 1;
 
             question.options.forEach(option => {
                 const button = document.createElement('button');
