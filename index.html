@@ -1,66 +1,93 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            text-align: center;
-        }
-        .quiz-container {
-            background-color: #f5f5f5;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
-        .options {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin: 20px 0;
-        }
-        button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .option {
-            background-color: #e0e0e0;
-        }
-        .option:hover {
-            background-color: #d0d0d0;
-        }
-        .next {
-            background-color: #4CAF50;
-            color: white;
-            margin-top: 20px;
-        }
-        .score {
-            font-size: 18px;
-            margin: 20px 0;
-        }
-        .feedback {
-            margin: 10px 0;
-            font-weight: bold;
-        }
-        .correct {
-            color: #4CAF50;
-        }
-        .incorrect {
-            color: #f44336;
-        }
-        .progress {
-            margin-top: 10px;
-            font-size: 16px;
-        }
-    </style>
-</head>
+    <head>
+        <style>
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #f9f9f9;
+                text-align: center;
+                color: #333;
+            }
+            h1 {
+                color: #2c3e50;
+                margin-bottom: 30px;
+                font-size: 2.5em;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            }
+            .quiz-container {
+                background-color: white;
+                padding: 30px;
+                border-radius: 15px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                margin-top: 20px;
+            }
+            .score {
+                font-size: 20px;
+                margin: 20px 0;
+                color: #27ae60;
+            }
+            .progress {
+                font-size: 18px;
+                color: #3498db;
+                margin-bottom: 20px;
+            }
+            #question {
+                margin-bottom: 20px;
+                font-size: 18px;
+                color: #2c3e50;
+                line-height: 1.5;
+            }
+            .options {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                margin: 20px 0;
+            }
+            button {
+                padding: 15px 20px;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                transition: background-color 0.3s, transform 0.1s;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .option {
+                background-color: #ecf0f1;
+                color: #34495e;
+            }
+            .option:hover {
+                background-color: #bdc3c7;
+                transform: translateY(-2px);
+            }
+            .next {
+                background-color: #2ecc71;
+                color: white;
+                margin-top: 20px;
+            }
+            .next:hover {
+                background-color: #27ae60;
+            }
+            .feedback {
+                margin: 10px 0;
+                font-weight: bold;
+                font-size: 16px;
+            }
+            .correct {
+                color: #2ecc71;
+            }
+            .incorrect {
+                color: #e74c3c;
+            }
+        </style>
+    </head>
 <body>
     <h1>¡Aprende Español! - Spanish Grammar Quiz</h1>
+    <audio id="correctSound" src="correct.mp3" preload="auto"></audio>
+    <audio id="incorrectSound" src="incorrect.mp3" preload="auto"></audio>
     <div class="score">Score: <span id="score">0</span></div>
     <div class="progress">Question: <span id="current">1</span>/<span id="total">0</span></div>
     <div class="quiz-container">
@@ -71,675 +98,780 @@
     </div>
 
     <script>
-        const questions = [
-           // Articles (el, la, los, las)
-            {
-                question: "Choose the correct article for 'mesa' (table):",
-                options: ["el", "la", "los", "las"],
-                correct: "la",
-                explanation: "'Mesa' is a feminine noun, so it uses 'la'"
-            },
-            {
-                question: "Choose the correct article for 'libro' (book):",
-                options: ["el", "la", "los", "las"],
-                correct: "el",
-                explanation: "'Libro' is a masculine noun, so it uses 'el'"
-            },
-            {
-                question: "Choose the correct article for 'mujeres' (women):",
-                options: ["el", "la", "los", "las"],
-                correct: "las",
-                explanation: "'Mujeres' is feminine plural, so it uses 'las'"
-            },
-            {
-                question: "Choose the correct article for 'perros' (dogs):",
-                options: ["el", "la", "los", "las"],
-                correct: "los",
-                explanation: "'Perros' is masculine plural, so it uses 'los'"
-            },
-            {
-                question: "Choose the correct article for 'casa' (house):",
-                options: ["el", "la", "los", "las"],
-                correct: "la",
-                explanation: "'Casa' is feminine, so it uses 'la'"
-            },
-            // Present tense verb conjugations - Regular AR verbs
-            {
-                question: "Complete: 'Yo _____ español' (I speak Spanish)",
-                options: ["hablo", "hablas", "habla", "hablan"],
-                correct: "hablo",
-                explanation: "With 'yo' (I), regular -AR verbs end in '-o'"
-            },
-            {
-                question: "Complete: 'Tú _____ la pizza' (You eat the pizza)",
-                options: ["como", "comes", "come", "comen"],
-                correct: "comes",
-                explanation: "With 'tú' (you), regular -ER verbs end in '-es'"
-            },
-            {
-                question: "Complete: 'Ella _____ música' (She listens to music)",
-                options: ["escucho", "escuchas", "escucha", "escuchan"],
-                correct: "escucha",
-                explanation: "With 'ella' (she), regular -AR verbs end in '-a'"
-            },
-            {
-                question: "Complete: 'Nosotros _____ café' (We drink coffee)",
-                options: ["bebo", "bebes", "bebe", "bebemos"],
-                correct: "bebemos",
-                explanation: "With 'nosotros' (we), regular -ER verbs end in '-emos'"
-            },
-            {
-                question: "Complete: 'Ellos _____ en el parque' (They walk in the park)",
-                options: ["camino", "caminas", "camina", "caminan"],
-                correct: "caminan",
-                explanation: "With 'ellos' (they), regular -AR verbs end in '-an'"
-            },
-            // Ser vs Estar
-            {
-                question: "Complete: 'Juan _____ alto' (Juan is tall)",
-                options: ["es", "está", "son", "están"],
-                correct: "es",
-                explanation: "Use 'ser' for permanent characteristics"
-            },
-            {
-                question: "Complete: 'La sopa _____ caliente' (The soup is hot)",
-                options: ["es", "está", "son", "están"],
-                correct: "está",
-                explanation: "Use 'estar' for temporary states"
-            },
-            {
-                question: "Complete: 'Mi hermana _____ doctora' (My sister is a doctor)",
-                options: ["es", "está", "son", "están"],
-                correct: "es",
-                explanation: "Use 'ser' for professions"
-            },
-            {
-                question: "Complete: 'Los niños _____ en la escuela' (The children are at school)",
-                options: ["es", "está", "son", "están"],
-                correct: "están",
-                explanation: "Use 'estar' for location"
-            },
-            {
-                question: "Complete: 'El café _____ delicioso' (The coffee is delicious)",
-                options: ["es", "está", "son", "están"],
-                correct: "está",
-                explanation: "Use 'estar' for temporary states like taste"
-            },
-            // Adjective agreement
-            {
-                question: "Choose the correct form: 'La casa _____' (The big house)",
-                options: ["grande", "grandes", "grandes", "gran"],
-                correct: "grande",
-                explanation: "Adjectives ending in 'e' don't change for gender"
-            },
-            {
-                question: "Choose the correct form: 'El coche _____' (The red car)",
-                options: ["rojo", "roja", "rojos", "rojas"],
-                correct: "rojo",
-                explanation: "Adjectives must match the masculine noun"
-            },
-            {
-                question: "Choose the correct form: 'Las mesas _____' (The small tables)",
-                options: ["pequeño", "pequeña", "pequeños", "pequeñas"],
-                correct: "pequeñas",
-                explanation: "Adjectives must match feminine plural nouns"
-            },
-            {
-                question: "Choose the correct form: 'Los libros _____' (The new books)",
-                options: ["nuevo", "nueva", "nuevos", "nuevas"],
-                correct: "nuevos",
-                explanation: "Adjectives must match masculine plural nouns"
-            },
-            {
-                question: "Choose the correct form: 'La mujer _____' (The tall woman)",
-                options: ["alto", "alta", "altos", "altas"],
-                correct: "alta",
-                explanation: "Adjectives must match feminine singular nouns"
-            },
-            // Present tense irregular verbs
-            {
-                question: "Complete: 'Yo _____ a la tienda' (I go to the store)",
-                options: ["vo", "vas", "voy", "van"],
-                correct: "voy",
-                explanation: "'Ir' is irregular in all forms - 'voy' for 'yo'"
-            },
-            {
-                question: "Complete: 'Tú _____ jugo' (You have juice)",
-                options: ["teno", "tienes", "tiene", "tienen"],
-                correct: "tienes",
-                explanation: "'Tener' is irregular - 'tienes' for 'tú'"
-            },
-            {
-                question: "Complete: 'Ella _____ hacer la tarea' (She can do the homework)",
-                options: ["puedo", "puedes", "puede", "pueden"],
-                correct: "puede",
-                explanation: "'Poder' is irregular - 'puede' for he/she"
-            },
-            {
-                question: "Complete: 'Yo _____ dos hermanos' (I have two brothers)",
-                options: ["teno", "tienes", "tengo", "tienen"],
-                correct: "tengo",
-                explanation: "'Tener' is irregular - 'tengo' for 'yo'"
-            },
-            {
-                question: "Complete: 'Ellos _____ a México' (They come from Mexico)",
-                options: ["vengo", "vienes", "viene", "vienen"],
-                correct: "vienen",
-                explanation: "'Venir' is irregular - 'vienen' for they"
-            },
-            // Possessive adjectives
-            {
-                question: "Choose: '_____ libro' (my book)",
-                options: ["mi", "tu", "su", "nuestro"],
-                correct: "mi",
-                explanation: "Use 'mi' for 'my' before singular nouns"
-            },
-            {
-                question: "Choose: '_____ casas' (our houses)",
-                options: ["mis", "tus", "sus", "nuestras"],
-                correct: "nuestras",
-                explanation: "Use 'nuestras' for 'our' before feminine plural nouns"
-            },
-            {
-                question: "Choose: '_____ perro' (your dog)",
-                options: ["mi", "tu", "su", "nuestro"],
-                correct: "tu",
-                explanation: "Use 'tu' for 'your' (informal) before singular nouns"
-            },
-            {
-                question: "Choose: '_____ coches' (their cars)",
-                options: ["mis", "tus", "sus", "nuestros"],
-                correct: "sus",
-                explanation: "Use 'sus' for 'their' before plural nouns"
-            },
-            {
-                question: "Choose: '_____ padres' (my parents)",
-                options: ["mi", "mis", "tu", "tus"],
-                correct: "mis",
-                explanation: "Use 'mis' for 'my' before plural nouns"
-            },
-            // Numbers and counting
-            {
-                question: "Choose: '_____ libro' (one book)",
-                options: ["un", "una", "unos", "unas"],
-                correct: "un",
-                explanation: "'Un' is used before masculine singular nouns"
-            },
-            {
-                question: "Choose: '_____ mesas' (some tables)",
-                options: ["un", "una", "unos", "unas"],
-                correct: "unas",
-                explanation: "'Unas' is used before feminine plural nouns"
-            },
-            {
-                question: "Complete: 'Tengo _____ años' (I am 20 years old)",
-                options: ["veinte", "veinti", "viente", "venti"],
-                correct: "veinte",
-                explanation: "'Veinte' is the correct spelling for 20"
-            },
-            {
-                question: "Choose: '_____ silla' (a chair)",
-                options: ["un", "una", "unos", "unas"],
-                correct: "una",
-                explanation: "'Una' is used before feminine singular nouns"
-            },
-            {
-                question: "Choose: '_____ libros' (some books)",
-                options: ["un", "una", "unos", "unas"],
-                correct: "unos",
-                explanation: "'Unos' is used before masculine plural nouns"
-            },
-            // Prepositions
-            {
-                question: "Complete: 'El libro está _____ la mesa' (The book is on the table)",
-                options: ["en", "de", "a", "sobre"],
-                correct: "sobre",
-                explanation: "'Sobre' means 'on top of'"
-            },
-            {
-                question: "Complete: 'Voy _____ casa' (I'm going home)",
-                options: ["en", "de", "a", "por"],
-                correct: "a",
-                explanation: "'A' is used for movement towards a place"
-            },
-            {
-                question: "Complete: 'El libro _____ Juan' (Juan's book)",
-                options: ["en", "de", "a", "por"],
-                correct: "de",
-                explanation: "'De' shows possession"
-            },
-            {
-                question: "Complete: 'Estudio _____ la biblioteca' (I study at the library)",
-                options: ["en", "de", "a", "por"],
-                correct: "en",
-                explanation: "'En' means 'in' or 'at' for location"
-            },
-            {
-                question: "Complete: 'Camino _____ el parque' (I walk through the park)",
-                options: ["en", "de", "a", "por"],
-                correct: "por",
-                explanation: "'Por' means 'through' or 'around'"
-            },
-            // Days and Time
-            {
-                question: "Choose: '_____ lunes' (on Monday)",
-                options: ["el", "la", "los", "las"],
-                correct: "el",
-                explanation: "Days of the week are masculine and use 'el'"
-            },
-            {
-                question: "Complete: 'Son las _____ de la tarde' (It's 3:00 PM)",
-                options: ["tres", "tres y media", "tercero", "tercera"],
-                correct: "tres",
-                explanation: "Use cardinal numbers for telling time"
-            },
-            {
-                question: "Choose the correct expression: 'in the morning'",
-                options: ["por la mañana", "en la mañana", "de la mañana", "a la mañana"],
-                correct: "por la mañana",
-                explanation: "'Por la mañana' is the most common way to say 'in the morning'"
-            },
-            {
-                question: "Complete: '_____ domingo' (every Sunday)",
-                options: ["el", "la", "cada", "todo"],
-                correct: "cada",
-                explanation: "'Cada' means 'each' or 'every'"
-            },
-            {
-                question: "Choose: 'Es _____ tarde' (It's late)",
-                options: ["la", "el", "una", "un"],
-                correct: "la",
-                explanation: "'Tarde' (afternoon/evening) is feminine"
-            },
-            // Question words
-            {
-                question: "Complete: '¿_____ está el libro?' (Where is the book?)",
-                options: ["Qué", "Cuál", "Dónde", "Cuándo"],
-                correct: "Dónde",
-                explanation: "'Dónde' means 'where'"
-            },
-            {
-                question: "Complete: '¿_____ cuesta esto?' (How much is this?)",
-                options: ["Qué", "Cuánto", "Cuál", "Quién"],
-                correct: "Cuánto",
-                explanation: "'Cuánto' is used to ask 'how much'"
-            },
-            {
-                question: "Complete: '¿_____ es tu nombre?' (What is your name?)",
-                options: ["Qué", "Cuál", "Dónde", "Quién"],
-                correct: "Cuál",
-                explanation: "'Cuál' is used to ask 'which' or 'what' when identifying something"
-            },
-            {
-                question: "Complete: '¿_____ años tienes?' (How old are you?)",
-                options: ["Qué", "Cuántos", "Cuál", "Cuándo"],
-                correct: "Cuántos",
-                explanation: "'Cuántos' is used to ask 'how many'"
-            },
-            {
-                question: "Complete: '¿_____ es tu amigo?' (Who is your friend?)",
-                options: ["Qué", "Cuál", "Quién", "Dónde"],
-                correct: "Quién",
-                explanation: "'Quién' means 'who'"
-            },
-            // Weather Expressions
-            {
-                question: "Complete: '_____ frío' (It's cold)",
-                options: ["Hace", "Está", "Es", "Hay"],
-                correct: "Hace",
-                explanation: "'Hace' is used for weather conditions"
-            },
-            {
-                question: "Complete: '_____ lloviendo' (It's raining)",
-                options: ["Hace", "Está", "Es", "Hay"],
-                correct: "Está",
-                explanation: "'Está' is used with the gerund for current weather"
-            },
-            {
-                question: "Complete: '_____ nublado' (It's cloudy)",
-                options: ["Hace", "Está", "Es", "Hay"],
-                correct: "Está",
-                explanation: "'Está' is used with weather adjectives"
-            },
-            // Future Expression with 'IR A'
-            {
-                question: "Complete: 'Voy _____ estudiar' (I am going to study)",
-                options: ["a", "de", "para", "por"],
-                correct: "a",
-                explanation: "'Ir a + infinitive' expresses future actions"
-            },
-            {
-                question: "Complete: 'Ellos van _____ comer' (They are going to eat)",
-                options: ["a", "de", "para", "por"],
-                correct: "a",
-                explanation: "'Ir a + infinitive' is used for planned future actions"
-            },
-            // Demonstrative Adjectives
-            {
-                question: "Choose: '_____ libro' (this book)",
-                options: ["este", "esta", "estos", "estas"],
-                correct: "este",
-                explanation: "'Este' is used for masculine singular objects near the speaker"
-            },
-            {
-                question: "Choose: '_____ mesa' (that table)",
-                options: ["ese", "esa", "esos", "esas"],
-                correct: "esa",
-                explanation: "'Esa' is used for feminine singular objects near the listener"
-            },
-            {
-                question: "Choose: '_____ casas' (those houses over there)",
-                options: ["aquel", "aquella", "aquellos", "aquellas"],
-                correct: "aquellas",
-                explanation: "'Aquellas' is used for feminine plural objects far from both speaker and listener"
-            },
-            // Personal Pronouns
-            {
-                question: "Complete: '_____ vivo en Madrid' (I live in Madrid)",
-                options: ["Yo", "Tú", "Él", "Ella"],
-                correct: "Yo",
-                explanation: "'Yo' is the first person singular pronoun"
-            },
-            {
-                question: "Complete: '_____ hablan español' (They speak Spanish)",
-                options: ["Ellos", "Nosotros", "Ustedes", "Vosotros"],
-                correct: "Ellos",
-                explanation: "'Ellos' is the third person plural masculine pronoun"
-            },
-            // Common Regular -IR Verbs
-            {
-                question: "Complete: 'Yo _____ mucho' (I live a lot)",
-                options: ["vivo", "vives", "vive", "viven"],
-                correct: "vivo",
-                explanation: "Regular -IR verbs end in '-o' for 'yo' form"
-            },
-            {
-                question: "Complete: 'Ellas _____ felices' (They live happily)",
-                options: ["vivo", "vives", "vive", "viven"],
-                correct: "viven",
-                explanation: "Regular -IR verbs end in '-en' for third person plural"
-            },
-            // Reflexive Verbs
-            {
-                question: "Complete: 'Yo _____ levanto temprano' (I get up early)",
-                options: ["me", "te", "se", "nos"],
-                correct: "me",
-                explanation: "'Me' is the reflexive pronoun for 'yo'"
-            },
-            {
-                question: "Complete: 'Tú _____ duchas' (You take a shower)",
-                options: ["me", "te", "se", "nos"],
-                correct: "te",
-                explanation: "'Te' is the reflexive pronoun for 'tú'"
-            },
-            // Time Expressions
-            {
-                question: "Choose: '_____ veces por semana' (times per week)",
-                options: ["todo", "cada", "todos", "todas"],
-                correct: "todas",
-                explanation: "'Todas' agrees with feminine plural 'veces'"
-            },
-            {
-                question: "Complete: 'Una vez _____ mes' (Once a month)",
-                options: ["al", "del", "en el", "por"],
-                correct: "al",
-                explanation: "'Al' is the contraction of 'a + el' used in time expressions"
-            },
-            // Object Pronouns
-            {
-                question: "Complete: 'Juan _____ llama' (Juan calls me)",
-                options: ["me", "te", "le", "nos"],
-                correct: "me",
-                explanation: "'Me' is the direct object pronoun for 'I/me'"
-            },
-            {
-                question: "Complete: 'Yo _____ veo' (I see them)",
-                options: ["lo", "la", "los", "las"],
-                correct: "los",
-                explanation: "'Los' is used for masculine plural direct objects"
-            },
-            // Gustar and Similar Verbs
-            {
-                question: "Complete: 'A mí _____ gusta bailar' (I like to dance)",
-                options: ["me", "te", "le", "les"],
-                correct: "me",
-                explanation: "'Me gusta' is used for 'I like'"
-            },
-            {
-                question: "Complete: 'A ellos _____ encantan los perros' (They love dogs)",
-                options: ["me", "te", "le", "les"],
-                correct: "les",
-                explanation: "'Les encanta' is used for 'they love'"
-            },
-            // Comparatives
-            {
-                question: "Complete: 'Juan es _____ alto que Pedro' (Juan is taller than Pedro)",
-                options: ["más", "menos", "tan", "tanto"],
-                correct: "más",
-                explanation: "'Más ... que' means 'more/er ... than'"
-            },
-            {
-                question: "Complete: 'Esta casa es _____ cara' (This house is less expensive)",
-                options: ["más", "menos", "tan", "tanto"],
-                correct: "menos",
-                explanation: "'Menos' means 'less'"
-            },
-            // Negative Expressions
-            {
-                question: "Choose: 'No hay _____ en la nevera' (There's nothing in the fridge)",
-                options: ["nada", "nadie", "nunca", "ningún"],
-                correct: "nada",
-                explanation: "'Nada' means 'nothing'"
-            },
-            {
-                question: "Choose: '_____ vino a la fiesta' (Nobody came to the party)",
-                options: ["nada", "nadie", "nunca", "ningún"],
-                correct: "nadie",
-                explanation: "'Nadie' means 'nobody'"
-            },
-            // Por vs Para
-            {
-                question: "Complete: 'Este regalo es _____ ti' (This gift is for you)",
-                options: ["por", "para", "a", "de"],
-                correct: "para",
-                explanation: "'Para' is used to indicate the recipient"
-            },
-            {
-                question: "Complete: 'Gracias _____ tu ayuda' (Thanks for your help)",
-                options: ["por", "para", "a", "de"],
-                correct: "por",
-                explanation: "'Por' is used to express gratitude"
-            },
-            // Common Adverbs
-            {
-                question: "Choose: 'Ella habla _____ español' (She speaks Spanish well)",
-                options: ["bien", "bueno", "mejor", "buena"],
-                correct: "bien",
-                explanation: "'Bien' is an adverb meaning 'well'"
-            },
-            {
-                question: "Choose: 'Juan corre _____' (Juan runs quickly)",
-                options: ["rápido", "rápida", "rápidos", "rápidas"],
-                correct: "rápido",
-                explanation: "'Rápido' as an adverb doesn't change form"
-            },
-            // Hay vs Estar
-            {
-                question: "Complete: '_____ un libro en la mesa' (There is a book on the table)",
-                options: ["Hay", "Es", "Está", "Son"],
-                correct: "Hay",
-                explanation: "'Hay' means 'there is/are' for indefinite items"
-            },
-            {
-                question: "Complete: 'El libro _____ en la mesa' (The book is on the table)",
-                options: ["hay", "es", "está", "son"],
-                correct: "está",
-                explanation: "'Estar' is used for location of specific items"
-            },
-            // More Regular -ER Verbs
-            {
-                question: "Complete: 'Nosotros _____ la tele' (We watch TV)",
-                options: ["vemos", "vamos", "venimos", "vivimos"],
-                correct: "vemos",
-                explanation: "'Ver' conjugated for 'nosotros' is 'vemos'"
-            },
-            // Days of the Week
-            {
-                question: "Complete: 'Hoy es _____' (Today is Friday)",
-                options: ["lunes", "miércoles", "viernes", "domingo"],
-                correct: "viernes",
-                explanation: "Days of the week are not capitalized in Spanish"
-            },
-            {
-                question: "Choose: '_____ es mi día favorito' (Saturday is my favorite day)",
-                options: ["El sábado", "La sábado", "Los sábado", "Las sábado"],
-                correct: "El sábado",
-                explanation: "Days of the week are masculine"
-            },
-            // Months
-            {
-                question: "Complete: 'Mi cumpleaños es en _____' (My birthday is in August)",
-                options: ["augusto", "agosto", "augosto", "agosta"],
-                correct: "agosto",
-                explanation: "Months are not capitalized in Spanish"
-            },
-            {
-                question: "Choose the correct spelling:",
-                options: ["diciembre", "disiembre", "dicembre", "deziembre"],
-                correct: "diciembre",
-                explanation: "'Diciembre' is the correct spelling of December"
-            },
-            // Frequency Expressions
-            {
-                question: "Choose: '_____ voy al gimnasio' (I never go to the gym)",
-                options: ["Nunca", "Siempre", "A veces", "Casi"],
-                correct: "Nunca",
-                explanation: "'Nunca' means 'never'"
-            },
-            {
-                question: "Complete: 'Voy _____ al cine' (I sometimes go to the movies)",
-                options: ["nunca", "siempre", "a veces", "tarde"],
-                correct: "a veces",
-                explanation: "'A veces' means 'sometimes'"
-            },
-            // Commands (Imperatives)
-            {
-                question: "Choose the correct command: '_____ la puerta' (Close the door!)",
-                options: ["Cierra", "Cierre", "Cerrar", "Cerrando"],
-                correct: "Cierra",
-                explanation: "Informal command (tú) for 'cerrar'"
-            },
-            {
-                question: "Choose the formal command: '_____ aquí' (Sit here!)",
-                options: ["Sienta", "Siéntate", "Sentarse", "Siéntese"],
-                correct: "Siéntese",
-                explanation: "Formal reflexive command (usted)"
-            },
-            // Basic Past Tense (Preterite)
-            {
-                question: "Complete: 'Yo _____ pizza ayer' (I ate pizza yesterday)",
-                options: ["como", "comí", "comió", "comiendo"],
-                correct: "comí",
-                explanation: "First person singular preterite of 'comer'"
-            },
-            {
-                question: "Complete: 'Ella _____ a Madrid' (She traveled to Madrid)",
-                options: ["viaja", "viajó", "viaje", "viajando"],
-                correct: "viajó",
-                explanation: "Third person singular preterite of 'viajar'"
-            },
-            // Numbers and Ordinals
-            {
-                question: "Choose: 'Es el _____ piso' (It's the first floor)",
-                options: ["uno", "primer", "primero", "primera"],
-                correct: "primer",
-                explanation: "'Primer' is used before masculine nouns"
-            },
-            {
-                question: "Complete: 'Vivo en el _____ piso' (I live on the third floor)",
-                options: ["tres", "tercero", "tercer", "tercera"],
-                correct: "tercer",
-                explanation: "'Tercer' is used before masculine nouns"
-            },
-            // Direct Objects
-            {
-                question: "Choose: '_____ veo en la calle' (I see them in the street)",
-                options: ["lo", "la", "los", "les"],
-                correct: "los",
-                explanation: "'Los' is the direct object pronoun for masculine plural"
-            },
-            {
-                question: "Complete: 'Juan _____ compra' (Juan buys it)",
-                options: ["le", "lo", "la", "les"],
-                correct: "lo",
-                explanation: "'Lo' is the direct object pronoun for masculine singular"
-            },
-            // Indirect Objects
-            {
-                question: "Complete: 'María _____ da un regalo' (María gives him/her a gift)",
-                options: ["lo", "la", "le", "les"],
-                correct: "le",
-                explanation: "'Le' is the indirect object pronoun for him/her"
-            },
-            {
-                question: "Choose: '_____ enviamos una carta' (We send them a letter)",
-                options: ["los", "las", "le", "les"],
-                correct: "les",
-                explanation: "'Les' is the indirect object pronoun for them"
-            },
-            // More Present Progressive
-            {
-                question: "Complete: 'Estoy _____ un libro' (I am reading a book)",
-                options: ["leo", "leiendo", "leyendo", "leendo"],
-                correct: "leyendo",
-                explanation: "Present participle of 'leer' is irregular"
-            },
-            {
-                question: "Complete: 'Están _____ música' (They are listening to music)",
-                options: ["escucho", "escuchando", "escuchiendo", "escucha"],
-                correct: "escuchando",
-                explanation: "Present participle of regular -AR verbs end in '-ando'"
-            },
-            // More Prepositions
-            {
-                question: "Complete: 'El gato está _____ de la mesa' (The cat is under the table)",
-                options: ["sobre", "en", "debajo", "entre"],
-                correct: "debajo",
-                explanation: "'Debajo de' means 'under'"
-            },
-            {
-                question: "Choose: 'El libro está _____ la mesa y la silla' (The book is between the table and chair)",
-                options: ["sobre", "en", "debajo", "entre"],
-                correct: "entre",
-                explanation: "'Entre' means 'between'"
-            },
-            // More Common Expressions
-            {
-                question: "Complete: '_____ prisa' (I'm in a hurry)",
-                options: ["Tengo", "Estoy", "Hay", "Soy"],
-                correct: "Tengo",
-                explanation: "'Tener prisa' means 'to be in a hurry'"
-            },
-            {
-                question: "Choose: '_____ razón' (You're right)",
-                options: ["Tengo", "Tienes", "Tiene", "Tienen"],
-                correct: "Tienes",
-                explanation: "'Tener razón' means 'to be right'"
-            },
-            // Time Expressions
-            {
-                question: "Complete: '_____ un rato' (In a while)",
-                options: ["En", "Durante", "Por", "Dentro de"],
-                correct: "Dentro de",
-                explanation: "'Dentro de' means 'in' for future time"
-            },
-            {
-                question: "Choose: '_____ dos horas' (For two hours)",
-                options: ["En", "Durante", "Por", "Dentro de"],
-                correct: "Durante",
-                explanation: "'Durante' expresses duration"
-            }
-        ];
+const questions = [
+    // Articles (el, la, los, las)
+    {
+        question: "Choose the correct article for 'mesa' (table):",
+        group: "Articles (el, la, los, las)",
+        options: ["el", "la", "los", "las"],
+        correct: "la",
+        explanation: "'Mesa' is a feminine noun, so it uses 'la'"
+    },
+    {
+        question: "Choose the correct article for 'libro' (book):",
+        group: "Articles (el, la, los, las)",
+        options: ["el", "la", "los", "las"],
+        correct: "el",
+        explanation: "'Libro' is a masculine noun, so it uses 'el'"
+    },
+    {
+        question: "Choose the correct article for 'mujeres' (women):",
+        group: "Articles (el, la, los, las)",
+        options: ["el", "la", "los", "las"],
+        correct: "las",
+        explanation: "'Mujeres' is feminine plural, so it uses 'las'"
+    },
+    {
+        question: "Choose the correct article for 'perros' (dogs):",
+        group: "Articles (el, la, los, las)",
+        options: ["el", "la", "los", "las"],
+        correct: "los",
+        explanation: "'Perros' is masculine plural, so it uses 'los'"
+    },
+    {
+        question: "Choose the correct article for 'casa' (house):",
+        group: "Articles (el, la, los, las)",
+        options: ["el", "la", "los", "las"],
+        correct: "la",
+        explanation: "'Casa' is feminine, so it uses 'la'"
+    },
+    // Present tense verb conjugations - Regular AR verbs
+    {
+        question: "Complete: 'Yo _____ español' (I speak Spanish)",
+        group: "Present tense verb conjugations - Regular AR verbs",
+        options: ["hablo", "hablas", "habla", "hablan"],
+        correct: "hablo",
+        explanation: "With 'yo' (I), regular -AR verbs end in '-o'"
+    },
+    {
+        question: "Complete: 'Tú _____ la pizza' (You eat the pizza)",
+        group: "Present tense verb conjugations - Regular AR verbs",
+        options: ["como", "comes", "come", "comen"],
+        correct: "comes",
+        explanation: "With 'tú' (you), regular -ER verbs end in '-es'"
+    },
+    {
+        question: "Complete: 'Ella _____ música' (She listens to music)",
+        group: "Present tense verb conjugations - Regular AR verbs",
+        options: ["escucho", "escuchas", "escucha", "escuchan"],
+        correct: "escucha",
+        explanation: "With 'ella' (she), regular -AR verbs end in '-a'"
+    },
+    {
+        question: "Complete: 'Nosotros _____ café' (We drink coffee)",
+        group: "Present tense verb conjugations - Regular AR verbs",
+        options: ["bebo", "bebes", "bebe", "bebemos"],
+        correct: "bebemos",
+        explanation: "With 'nosotros' (we), regular -ER verbs end in '-emos'"
+    },
+    {
+        question: "Complete: 'Ellos _____ en el parque' (They walk in the park)",
+        group: "Present tense verb conjugations - Regular AR verbs",
+        options: ["camino", "caminas", "camina", "caminan"],
+        correct: "caminan",
+        explanation: "With 'ellos' (they), regular -AR verbs end in '-an'"
+    },
+    // Ser vs Estar
+    {
+        question: "Complete: 'Juan _____ alto' (Juan is tall)",
+        group: "Ser vs Estar",
+        options: ["es", "está", "son", "están"],
+        correct: "es",
+        explanation: "Use 'ser' for permanent characteristics"
+    },
+    {
+        question: "Complete: 'La sopa _____ caliente' (The soup is hot)",
+        group: "Ser vs Estar",
+        options: ["es", "está", "son", "están"],
+        correct: "está",
+        explanation: "Use 'estar' for temporary states"
+    },
+    {
+        question: "Complete: 'Mi hermana _____ doctora' (My sister is a doctor)",
+        group: "Ser vs Estar",
+        options: ["es", "está", "son", "están"],
+        correct: "es",
+        explanation: "Use 'ser' for professions"
+    },
+    {
+        question: "Complete: 'Los niños _____ en la escuela' (The children are at school)",
+        group: "Ser vs Estar",
+        options: ["es", "está", "son", "están"],
+        correct: "están",
+        explanation: "Use 'estar' for location"
+    },
+    {
+        question: "Complete: 'El café _____ delicioso' (The coffee is delicious)",
+        group: "Ser vs Estar",
+        options: ["es", "está", "son", "están"],
+        correct: "está",
+        explanation: "Use 'estar' for temporary states like taste"
+    },
+    // Adjective agreement
+    {
+        question: "Choose the correct form: 'La casa _____' (The big house)",
+        group: "Adjective agreement",
+        options: ["grande", "grandes", "grandes", "gran"],
+        correct: "grande",
+        explanation: "Adjectives ending in 'e' don't change for gender"
+    },
+    {
+        question: "Choose the correct form: 'El coche _____' (The red car)",
+        group: "Adjective agreement",
+        options: ["rojo", "roja", "rojos", "rojas"],
+        correct: "rojo",
+        explanation: "Adjectives must match the masculine noun"
+    },
+    {
+        question: "Choose the correct form: 'Las mesas _____' (The small tables)",
+        group: "Adjective agreement",
+        options: ["pequeño", "pequeña", "pequeños", "pequeñas"],
+        correct: "pequeñas",
+        explanation: "Adjectives must match feminine plural nouns"
+    },
+    {
+        question: "Choose the correct form: 'Los libros _____' (The new books)",
+        group: "Adjective agreement",
+        options: ["nuevo", "nueva", "nuevos", "nuevas"],
+        correct: "nuevos",
+        explanation: "Adjectives must match masculine plural nouns"
+    },
+    {
+        question: "Choose the correct form: 'La mujer _____' (The tall woman)",
+        group: "Adjective agreement",
+        options: ["alto", "alta", "altos", "altas"],
+        correct: "alta",
+        explanation: "Adjectives must match feminine singular nouns"
+    },
+    // Present tense irregular verbs
+    {
+        question: "Complete: 'Yo _____ a la tienda' (I go to the store)",
+        group: "Present tense irregular verbs",
+        options: ["vo", "vas", "voy", "van"],
+        correct: "voy",
+        explanation: "'Ir' is irregular in all forms - 'voy' for 'yo'"
+    },
+    {
+        question: "Complete: 'Tú _____ jugo' (You have juice)",
+        group: "Present tense irregular verbs",
+        options: ["teno", "tienes", "tiene", "tienen"],
+        correct: "tienes",
+        explanation: "'Tener' is irregular - 'tienes' for 'tú'"
+    },
+    {
+        question: "Complete: 'Ella _____ hacer la tarea' (She can do the homework)",
+        group: "Present tense irregular verbs",
+        options: ["puedo", "puedes", "puede", "pueden"],
+        correct: "puede",
+        explanation: "'Poder' is irregular - 'puede' for he/she"
+    },
+    {
+        question: "Complete: 'Yo _____ dos hermanos' (I have two brothers)",
+        group: "Present tense irregular verbs",
+        options: ["teno", "tienes", "tengo", "tienen"],
+        correct: "tengo",
+        explanation: "'Tener' is irregular - 'tengo' for 'yo'"
+    },
+    {
+        question: "Complete: 'Ellos _____ a México' (They come from Mexico)",
+        group: "Present tense irregular verbs",
+        options: ["vengo", "vienes", "viene", "vienen"],
+        correct: "vienen",
+        explanation: "'Venir' is irregular - 'vienen' for they"
+    },
+    // Possessive adjectives
+    {
+        question: "Choose: '_____ libro' (my book)",
+        group: "Possessive adjectives",
+        options: ["mi", "tu", "su", "nuestro"],
+        correct: "mi",
+        explanation: "Use 'mi' for 'my' before singular nouns"
+    },
+    {
+        question: "Choose: '_____ casas' (our houses)",
+        group: "Possessive adjectives",
+        options: ["mis", "tus", "sus", "nuestras"],
+        correct: "nuestras",
+        explanation: "Use 'nuestras' for 'our' before feminine plural nouns"
+    },
+    {
+        question: "Choose: '_____ perro' (your dog)",
+        group: "Possessive adjectives",
+        options: ["mi", "tu", "su", "nuestro"],
+        correct: "tu",
+        explanation: "Use 'tu' for 'your' (informal) before singular nouns"
+    },
+    {
+        question: "Choose: '_____ coches' (their cars)",
+        group: "Possessive adjectives",
+        options: ["mis", "tus", "sus", "nuestros"],
+        correct: "sus",
+        explanation: "Use 'sus' for 'their' before plural nouns"
+    },
+    {
+        question: "Choose: '_____ padres' (my parents)",
+        group: "Possessive adjectives",
+        options: ["mi", "mis", "tu", "tus"],
+        correct: "mis",
+        explanation: "Use 'mis' for 'my' before plural nouns"
+    },
+    // Numbers and counting
+    {
+        question: "Choose: '_____ libro' (one book)",
+        group: "Numbers and counting",
+        options: ["un", "una", "unos", "unas"],
+        correct: "un",
+        explanation: "'Un' is used before masculine singular nouns"
+    },
+    {
+        question: "Choose: '_____ mesas' (some tables)",
+        group: "Numbers and counting",
+        options: ["un", "una", "unos", "unas"],
+        correct: "unas",
+        explanation: "'Unas' is used before feminine plural nouns"
+    },
+    {
+        question: "Complete: 'Tengo _____ años' (I am 20 years old)",
+        group: "Numbers and counting",
+        options: ["veinte", "veinti", "viente", "venti"],
+        correct: "veinte",
+        explanation: "'Veinte' is the correct spelling for 20"
+    },
+    {
+        question: "Choose: '_____ silla' (a chair)",
+        group: "Numbers and counting",
+        options: ["un", "una", "unos", "unas"],
+        correct: "una",
+        explanation: "'Una' is used before feminine singular nouns"
+    },
+    {
+        question: "Choose: '_____ libros' (some books)",
+        group: "Numbers and counting",
+        options: ["un", "una", "unos", "unas"],
+        correct: "unos",
+        explanation: "'Unos' is used before masculine plural nouns"
+    },
+    // Prepositions
+    {
+        question: "Complete: 'El libro está _____ la mesa' (The book is on the table)",
+        group: "Prepositions",
+        options: ["en", "de", "a", "sobre"],
+        correct: "sobre",
+        explanation: "'Sobre' means 'on top of'"
+    },
+    {
+        question: "Complete: 'Voy _____ casa' (I'm going home)",
+        group: "Prepositions",
+        options: ["en", "de", "a", "por"],
+        correct: "a",
+        explanation: "'A' is used for movement towards a place"
+    },
+    {
+        question: "Complete: 'El libro _____ Juan' (Juan's book)",
+        group: "Prepositions",
+        options: ["en", "de", "a", "por"],
+        correct: "de",
+        explanation: "'De' shows possession"
+    },
+    {
+        question: "Complete: 'Estudio _____ la biblioteca' (I study at the library)",
+        group: "Prepositions",
+        options: ["en", "de", "a", "por"],
+        correct: "en",
+        explanation: "'En' means 'in' or 'at' for location"
+    },
+    {
+        question: "Complete: 'Camino _____ el parque' (I walk through the park)",
+        group: "Prepositions",
+        options: ["en", "de", "a", "por"],
+        correct: "por",
+        explanation: "'Por' means 'through' or 'around'"
+    },
+    // Days and Time
+    {
+        question: "Choose: '_____ lunes' (on Monday)",
+        group: "Days and Time",
+        options: ["el", "la", "los", "las"],
+        correct: "el",
+        explanation: "Days of the week are masculine and use 'el'"
+    },
+    {
+        question: "Complete: 'Son las _____ de la tarde' (It's 3:00 PM)",
+        group: "Days and Time",
+        options: ["tres", "tres y media", "tercero", "tercera"],
+        correct: "tres",
+        explanation: "Use cardinal numbers for telling time"
+    },
+    {
+        question: "Choose the correct expression: 'in the morning'",
+        group: "Days and Time",
+        options: ["por la mañana", "en la mañana", "de la mañana", "a la mañana"],
+        correct: "por la mañana",
+        explanation: "'Por la mañana' is the most common way to say 'in the morning'"
+    },
+    {
+        question: "Complete: '_____ domingo' (every Sunday)",
+        group: "Days and Time",
+        options: ["el", "la", "cada", "todo"],
+        correct: "cada",
+        explanation: "'Cada' means 'each' or 'every'"
+    },
+    {
+        question: "Choose: 'Es _____ tarde' (It's late)",
+        group: "Days and Time",
+        options: ["la", "el", "una", "un"],
+        correct: "la",
+        explanation: "'Tarde' (afternoon/evening) is feminine"
+    },
+    // Question words
+    {
+        question: "Complete: '¿_____ está el libro?' (Where is the book?)",
+        group: "Question words",
+        options: ["Qué", "Cuál", "Dónde", "Cuándo"],
+        correct: "Dónde",
+        explanation: "'Dónde' means 'where'"
+    },
+    {
+        question: "Complete: '¿_____ cuesta esto?' (How much is this?)",
+        group: "Question words",
+        options: ["Qué", "Cuánto", "Cuál", "Quién"],
+        correct: "Cuánto",
+        explanation: "'Cuánto' is used to ask 'how much'"
+    },
+    {
+        question: "Complete: '¿_____ es tu nombre?' (What is your name?)",
+        group: "Question words",
+        options: ["Qué", "Cuál", "Dónde", "Quién"],
+        correct: "Cuál",
+        explanation: "'Cuál' is used to ask 'which' or 'what' when identifying something"
+    },
+    {
+        question: "Complete: '¿_____ años tienes?' (How old are you?)",
+        group: "Question words",
+        options: ["Qué", "Cuántos", "Cuál", "Cuándo"],
+        correct: "Cuántos",
+        explanation: "'Cuántos' is used to ask 'how many'"
+    },
+    {
+        question: "Complete: '¿_____ es tu amigo?' (Who is your friend?)",
+        group: "Question words",
+        options: ["Qué", "Cuál", "Quién", "Dónde"],
+        correct: "Quién",
+        explanation: "'Quién' means 'who'"
+    },
+    // Weather Expressions
+    {
+        question: "Complete: '_____ frío' (It's cold)",
+        group: "Weather Expressions",
+        options: ["Hace", "Está", "Es", "Hay"],
+        correct: "Hace",
+        explanation: "'Hace' is used for weather conditions"
+    },
+    {
+        question: "Complete: '_____ lloviendo' (It's raining)",
+        group: "Weather Expressions",
+        options: ["Hace", "Está", "Es", "Hay"],
+        correct: "Está",
+        explanation: "'Está' is used with the gerund for current weather"
+    },
+    {
+        question: "Complete: '_____ nublado' (It's cloudy)",
+        group: "Weather Expressions",
+        options: ["Hace", "Está", "Es", "Hay"],
+        correct: "Está",
+        explanation: "'Está' is used with weather adjectives"
+    },
+    // Future Expression with 'IR A'
+    {
+        question: "Complete: 'Voy _____ estudiar' (I am going to study)",
+        group: "Future Expression with 'IR A'",
+        options: ["a", "de", "para", "por"],
+        correct: "a",
+        explanation: "'Ir a + infinitive' expresses future actions"
+    },
+    {
+        question: "Complete: 'Ellos van _____ comer' (They are going to eat)",
+        group: "Future Expression with 'IR A'",
+        options: ["a", "de", "para", "por"],
+        correct: "a",
+        explanation: "'Ir a + infinitive' is used for planned future actions"
+    },
+    // Demonstrative Adjectives
+    {
+        question: "Choose: '_____ libro' (this book)",
+        group: "Demonstrative Adjectives",
+        options: ["este", "esta", "estos", "estas"],
+        correct: "este",
+        explanation: "'Este' is used for masculine singular objects near the speaker"
+    },
+    {
+        question: "Choose: '_____ mesa' (that table)",
+        group: "Demonstrative Adjectives",
+        options: ["ese", "esa", "esos", "esas"],
+        correct: "esa",
+        explanation: "'Esa' is used for feminine singular objects near the listener"
+    },
+    {
+        question: "Choose: '_____ casas' (those houses over there)",
+        group: "Demonstrative Adjectives",
+        options: ["aquel", "aquella", "aquellos", "aquellas"],
+        correct: "aquellas",
+        explanation: "'Aquellas' is used for feminine plural objects far from both speaker and listener"
+    },
+    // Personal Pronouns
+    {
+        question: "Complete: '_____ vivo en Madrid' (I live in Madrid)",
+        group: "Personal Pronouns",
+        options: ["Yo", "Tú", "Él", "Ella"],
+        correct: "Yo",
+        explanation: "'Yo' is the first person singular pronoun"
+    },
+    {
+        question: "Complete: '_____ hablan español' (They speak Spanish)",
+        group: "Personal Pronouns",
+        options: ["Ellos", "Nosotros", "Ustedes", "Vosotros"],
+        correct: "Ellos",
+        explanation: "'Ellos' is the third person plural masculine pronoun"
+    },
+    // Common Regular -IR Verbs
+    {
+        question: "Complete: 'Yo _____ mucho' (I live a lot)",
+        group: "Common Regular -IR Verbs",
+        options: ["vivo", "vives", "vive", "viven"],
+        correct: "vivo",
+        explanation: "Regular -IR verbs end in '-o' for 'yo' form"
+    },
+    {
+        question: "Complete: 'Ellas _____ felices' (They live happily)",
+        group: "Common Regular -IR Verbs",
+        options: ["vivo", "vives", "vive", "viven"],
+        correct: "viven",
+        explanation: "Regular -IR verbs end in '-en' for third person plural"
+    },
+    // Reflexive Verbs
+    {
+        question: "Complete: 'Yo _____ levanto temprano' (I get up early)",
+        group: "Reflexive Verbs",
+        options: ["me", "te", "se", "nos"],
+        correct: "me",
+        explanation: "'Me' is the reflexive pronoun for 'yo'"
+    },
+    {
+        question: "Complete: 'Tú _____ duchas' (You take a shower)",
+        group: "Reflexive Verbs",
+        options: ["me", "te", "se", "nos"],
+        correct: "te",
+        explanation: "'Te' is the reflexive pronoun for 'tú'"
+    },
+    // Time Expressions
+    {
+        question: "Choose: '_____ veces por semana' (times per week)",
+        group: "Time Expressions",
+        options: ["todo", "cada", "todos", "todas"],
+        correct: "todas",
+        explanation: "'Todas' agrees with feminine plural 'veces'"
+    },
+    {
+        question: "Complete: 'Una vez _____ mes' (Once a month)",
+        group: "Time Expressions",
+        options: ["al", "del", "en el", "por"],
+        correct: "al",
+        explanation: "'Al' is the contraction of 'a + el' used in time expressions"
+    },
+    // Object Pronouns
+    {
+        question: "Complete: 'Juan _____ llama' (Juan calls me)",
+        group: "Object Pronouns",
+        options: ["me", "te", "le", "nos"],
+        correct: "me",
+        explanation: "'Me' is the direct object pronoun for 'I/me'"
+    },
+    {
+        question: "Complete: 'Yo _____ veo' (I see them)",
+        group: "Object Pronouns",
+        options: ["lo", "la", "los", "las"],
+        correct: "los",
+        explanation: "'Los' is used for masculine plural direct objects"
+    },
+    // Gustar and Similar Verbs
+    {
+        question: "Complete: 'A mí _____ gusta bailar' (I like to dance)",
+        group: "Gustar and Similar Verbs",
+        options: ["me", "te", "le", "les"],
+        correct: "me",
+        explanation: "'Me gusta' is used for 'I like'"
+    },
+    {
+        question: "Complete: 'A ellos _____ encantan los perros' (They love dogs)",
+        group: "Gustar and Similar Verbs",
+        options: ["me", "te", "le", "les"],
+        correct: "les",
+        explanation: "'Les encanta' is used for 'they love'"
+    },
+    // Comparatives
+    {
+        question: "Complete: 'Juan es _____ alto que Pedro' (Juan is taller than Pedro)",
+        group: "Comparatives",
+        options: ["más", "menos", "tan", "tanto"],
+        correct: "más",
+        explanation: "'Más ... que' means 'more/er ... than'"
+    },
+    {
+        question: "Complete: 'Esta casa es _____ cara' (This house is less expensive)",
+        group: "Comparatives",
+        options: ["más", "menos", "tan", "tanto"],
+        correct: "menos",
+        explanation: "'Menos' means 'less'"
+    },
+    // Negative Expressions
+    {
+        question: "Choose: 'No hay _____ en la nevera' (There's nothing in the fridge)",
+        group: "Negative Expressions",
+        options: ["nada", "nadie", "nunca", "ningún"],
+        correct: "nada",
+        explanation: "'Nada' means 'nothing'"
+    },
+    {
+        question: "Choose: '_____ vino a la fiesta' (Nobody came to the party)",
+        group: "Negative Expressions",
+        options: ["nada", "nadie", "nunca", "ningún"],
+        correct: "nadie",
+        explanation: "'Nadie' means 'nobody'"
+    },
+    // Por vs Para
+    {
+        question: "Complete: 'Este regalo es _____ ti' (This gift is for you)",
+        group: "Por vs Para",
+        options: ["por", "para", "a", "de"],
+        correct: "para",
+        explanation: "'Para' is used to indicate the recipient"
+    },
+    {
+        question: "Complete: 'Gracias _____ tu ayuda' (Thanks for your help)",
+        group: "Por vs Para",
+        options: ["por", "para", "a", "de"],
+        correct: "por",
+        explanation: "'Por' is used to express gratitude"
+    },
+    // Common Adverbs
+    {
+        question: "Choose: 'Ella habla _____ español' (She speaks Spanish well)",
+        group: "Common Adverbs",
+        options: ["bien", "bueno", "mejor", "buena"],
+        correct: "bien",
+        explanation: "'Bien' is an adverb meaning 'well'"
+    },
+    {
+        question: "Choose: 'Juan corre _____' (Juan runs quickly)",
+        group: "Common Adverbs",
+        options: ["rápido", "rápida", "rápidos", "rápidas"],
+        correct: "rápido",
+        explanation: "'Rápido' as an adverb doesn't change form"
+    },
+    // Hay vs Estar
+    {
+        question: "Complete: '_____ un libro en la mesa' (There is a book on the table)",
+        group: "Hay vs Estar",
+        options: ["Hay", "Es", "Está", "Son"],
+        correct: "Hay",
+        explanation: "'Hay' means 'there is/are' for indefinite items"
+    },
+    {
+        question: "Complete: 'El libro _____ en la mesa' (The book is on the table)",
+        group: "Hay vs Estar",
+        options: ["hay", "es", "está", "son"],
+        correct: "está",
+        explanation: "'Estar' is used for location of specific items"
+    },
+    // More Regular -ER Verbs
+    {
+        question: "Complete: 'Nosotros _____ la tele' (We watch TV)",
+        group: "More Regular -ER Verbs",
+        options: ["vemos", "vamos", "venimos", "vivimos"],
+        correct: "vemos",
+        explanation: "'Ver' conjugated for 'nosotros' is 'vemos'"
+    },
+    // Days of the Week
+    {
+        question: "Complete: 'Hoy es _____' (Today is Friday)",
+        group: "Days of the Week",
+        options: ["lunes", "miércoles", "viernes", "domingo"],
+        correct: "viernes",
+        explanation: "Days of the week are not capitalized in Spanish"
+    },
+    {
+        question: "Choose: '_____ es mi día favorito' (Saturday is my favorite day)",
+        group: "Days of the Week",
+        options: ["El sábado", "La sábado", "Los sábado", "Las sábado"],
+        correct: "El sábado",
+        explanation: "Days of the week are masculine"
+    },
+    // Months
+    {
+        question: "Complete: 'Mi cumpleaños es en _____' (My birthday is in August)",
+        group: "Months",
+        options: ["augusto", "agosto", "augosto", "agosta"],
+        correct: "agosto",
+        explanation: "Months are not capitalized in Spanish"
+    },
+    {
+        question: "Choose the correct spelling:",
+        group: "Months",
+        options: ["diciembre", "disiembre", "dicembre", "deziembre"],
+        correct: "diciembre",
+        explanation: "'Diciembre' is the correct spelling of December"
+    },
+    // Frequency Expressions
+    {
+        question: "Choose: '_____ voy al gimnasio' (I never go to the gym)",
+        group: "Frequency Expressions",
+        options: ["Nunca", "Siempre", "A veces", "Casi"],
+        correct: "Nunca",
+        explanation: "'Nunca' means 'never'"
+    },
+    {
+        question: "Complete: 'Voy _____ al cine' (I sometimes go to the movies)",
+        group: "Frequency Expressions",
+        options: ["nunca", "siempre", "a veces", "tarde"],
+        correct: "a veces",
+        explanation: "'A veces' means 'sometimes'"
+    },
+    // Commands (Imperatives)
+    {
+        question: "Choose the correct command: '_____ la puerta' (Close the door!)",
+        group: "Commands (Imperatives)",
+        options: ["Cierra", "Cierre", "Cerrar", "Cerrando"],
+        correct: "Cierra",
+        explanation: "Informal command (tú) for 'cerrar'"
+    },
+    {
+        question: "Choose the formal command: '_____ aquí' (Sit here!)",
+        group: "Commands (Imperatives)",
+        options: ["Sienta", "Siéntate", "Sentarse", "Siéntese"],
+        correct: "Siéntese",
+        explanation: "Formal reflexive command (usted)"
+    },
+    // Basic Past Tense (Preterite)
+    {
+        question: "Complete: 'Yo _____ pizza ayer' (I ate pizza yesterday)",
+        group: "Basic Past Tense (Preterite)",
+        options: ["como", "comí", "comió", "comiendo"],
+        correct: "comí",
+        explanation: "First person singular preterite of 'comer'"
+    },
+    {
+        question: "Complete: 'Ella _____ a Madrid' (She traveled to Madrid)",
+        group: "Basic Past Tense (Preterite)",
+        options: ["viaja", "viajó", "viaje", "viajando"],
+        correct: "viajó",
+        explanation: "Third person singular preterite of 'viajar'"
+    },
+    // Numbers and Ordinals
+    {
+        question: "Choose: 'Es el _____ piso' (It's the first floor)",
+        group: "Numbers and Ordinals",
+        options: ["uno", "primer", "primero", "primera"],
+        correct: "primer",
+        explanation: "'Primer' is used before masculine nouns"
+    },
+    {
+        question: "Complete: 'Vivo en el _____ piso' (I live on the third floor)",
+        group: "Numbers and Ordinals",
+        options: ["tres", "tercero", "tercer", "tercera"],
+        correct: "tercer",
+        explanation: "'Tercer' is used before masculine nouns"
+    },
+    // Direct Objects
+    {
+        question: "Choose: '_____ veo en la calle' (I see them in the street)",
+        group: "Direct Objects",
+        options: ["lo", "la", "los", "les"],
+        correct: "los",
+        explanation: "'Los' is the direct object pronoun for masculine plural"
+    },
+    {
+        question: "Complete: 'Juan _____ compra' (Juan buys it)",
+        group: "Direct Objects",
+        options: ["le", "lo", "la", "les"],
+        correct: "lo",
+        explanation: "'Lo' is the direct object pronoun for masculine singular"
+    },
+    // Indirect Objects
+    {
+        question: "Complete: 'María _____ da un regalo' (María gives him/her a gift)",
+        group: "Indirect Objects",
+        options: ["lo", "la", "le", "les"],
+        correct: "le",
+        explanation: "'Le' is the indirect object pronoun for him/her"
+    },
+    {
+        question: "Choose: '_____ enviamos una carta' (We send them a letter)",
+        group: "Indirect Objects",
+        options: ["los", "las", "le", "les"],
+        correct: "les",
+        explanation: "'Les' is the indirect object pronoun for them"
+    },
+    // More Present Progressive
+    {
+        question: "Complete: 'Estoy _____ un libro' (I am reading a book)",
+        group: "More Present Progressive",
+        options: ["leo", "leiendo", "leyendo", "leendo"],
+        correct: "leyendo",
+        explanation: "Present participle of 'leer' is irregular"
+    },
+    {
+        question: "Complete: 'Están _____ música' (They are listening to music)",
+        group: "More Present Progressive",
+        options: ["escucho", "escuchando", "escuchiendo", "escucha"],
+        correct: "escuchando",
+        explanation: "Present participle of regular -AR verbs end in '-ando'"
+    },
+    // More Prepositions
+    {
+        question: "Complete: 'El gato está _____ de la mesa' (The cat is under the table)",
+        group: "More Prepositions",
+        options: ["sobre", "en", "debajo", "entre"],
+        correct: "debajo",
+        explanation: "'Debajo de' means 'under'"
+    },
+    {
+        question: "Choose: 'El libro está _____ la mesa y la silla' (The book is between the table and chair)",
+        group: "More Prepositions",
+        options: ["sobre", "en", "debajo", "entre"],
+        correct: "entre",
+        explanation: "'Entre' means 'between'"
+    },
+    // More Common Expressions
+    {
+        question: "Complete: '_____ prisa' (I'm in a hurry)",
+        group: "More Common Expressions",
+        options: ["Tengo", "Estoy", "Hay", "Soy"],
+        correct: "Tengo",
+        explanation: "'Tener prisa' means 'to be in a hurry'"
+    },
+    {
+        question: "Choose: '_____ razón' (You're right)",
+        group: "More Common Expressions",
+        options: ["Tengo", "Tienes", "Tiene", "Tienen"],
+        correct: "Tienes",
+        explanation: "'Tener razón' means 'to be right'"
+    },
+    // Time Expressions
+    {
+        question: "Complete: '_____ un rato' (In a while)",
+        group: "Time Expressions",
+        options: ["En", "Durante", "Por", "Dentro de"],
+        correct: "Dentro de",
+        explanation: "'Dentro de' means 'in' for future time"
+    },
+    {
+        question: "Choose: '_____ dos horas' (For two hours)",
+        group: "Time Expressions",
+        options: ["En", "Durante", "Por", "Dentro de"],
+        correct: "Durante",
+        explanation: "'Durante' expresses duration"
+    }    
+];        
 
         let currentQuestion = 0;
         let score = 0;
@@ -756,7 +888,8 @@
 
         function showQuestion() {
             const question = questions[currentQuestion];
-            questionElement.textContent = question.question;
+            // Use innerHTML to render HTML elements
+            questionElement.innerHTML = `${question.group}<br>${question.question}`;
             optionsElement.innerHTML = '';
             feedbackElement.innerHTML = '';
             nextButton.style.display = 'none';
@@ -774,6 +907,17 @@
         function checkAnswer(selected) {
             const question = questions[currentQuestion];
             const isCorrect = selected === question.correct;
+
+            // Play sound for correct answer
+            let sound;
+            if (isCorrect) {
+                sound = document.getElementById('correctSound');
+            } else {
+                sound = document.getElementById('incorrectSound');
+            }
+            sound.currentTime = 0; // Reset the audio to the start
+            sound.play();
+
             
             // Disable all options
             const options = document.querySelectorAll('.option');
