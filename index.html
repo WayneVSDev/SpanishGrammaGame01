@@ -82,6 +82,20 @@
             .incorrect {
                 color: #e74c3c;
             }
+            #readQuestion {
+                background-color: #3498db;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 10px 15px;
+                margin-top: 10px;
+                cursor: pointer;
+                font-size: 14px;
+                transition: background-color 0.3s;
+            }
+            #readQuestion:hover {
+                background-color: #2980b9;
+            }
         </style>
     </head>
 <body>
@@ -92,13 +106,14 @@
     <div class="progress">Question: <span id="current">1</span>/<span id="total">0</span></div>
     <div class="quiz-container">
         <div id="question"></div>
+        <button id="readQuestion">Read Question</button>
         <div class="options" id="options"></div>
         <div id="feedback" class="feedback"></div>
         <button class="next" id="next" style="display: none;">Next Question</button>
     </div>
 
     <script>
-const questions = [
+    const questions = [
     // Articles (el, la, los, las)
     {
         question: "Choose the correct article for 'mesa' (table):",
@@ -885,6 +900,23 @@ const questions = [
 
         // Initialize total questions count
         totalQuestionsElement.textContent = questions.length;
+
+        // Add event listener for the new button
+        const readQuestionButton = document.getElementById('readQuestion');
+        readQuestionButton.addEventListener('click', readQuestionAloud);
+
+        // Add this function to handle reading the question
+        function readQuestionAloud() {
+            /*
+            const questionText = questions[currentQuestion];
+            const utterance = new SpeechSynthesisUtterance(questionText);
+            utterance.lang = 'es-ES'; // Set to Spanish for Spanish questions
+            
+            // You can customize the voice if needed
+            // For now, this will use the default voice for Spanish on the user's system
+            speechSynthesis.speak(utterance);
+            */
+        }
 
         function showQuestion() {
             const question = questions[currentQuestion];
