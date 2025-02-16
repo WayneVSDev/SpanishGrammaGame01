@@ -907,15 +907,39 @@
 
         // Add this function to handle reading the question
         function readQuestionAloud() {
-            /*
-            const questionText = questions[currentQuestion];
-            const utterance = new SpeechSynthesisUtterance(questionText);
-            utterance.lang = 'es-ES'; // Set to Spanish for Spanish questions
-            
-            // You can customize the voice if needed
-            // For now, this will use the default voice for Spanish on the user's system
-            speechSynthesis.speak(utterance);
-            */
+            const question = questions[currentQuestion];
+            const utterances = [question.question, ...question.options];
+            function speakText(text) {
+                // Check if the text starts with an English word followed by a Spanish word
+                const segments = text.split(' ');
+                let currentLang = 'en-US'; // Default to English
+                for (let i = 0; i < segments.length; i++) {
+                    // Simplified language detection: 
+                    // If a word ends with 'o', 'a', 'os', 'as', it's likely Spanish for this example
+                    if (segments[i].match(/o|a|os|as$/i)) {
+                        currentLang = 'es-ES';
+                    } else {
+                        currentLang = 'en-US'; // Reset to English if no Spanish ending detected
+                    }
+                    const utterance = new SpeechSynthesisUtterance(segments[i]);
+                    utterance.lang = currentLang;
+                    speechSynthesis.speak(utterance);
+                    // Pause between words
+                    if (i < segments.length - 1) {
+                        setTimeout(() => {}, 200); // Small pause between words
+                    }
+                }
+            }
+            function speakOptions(index) {
+                if (index < utterances.length) {
+                    speakText(utterances[index]);
+                    setTimeout(() => {
+                        speakOptions(index + 1);
+                    }, 1000); // Pause between question/option
+                }
+            }
+            // Start speaking
+            speakOptions(0);
         }
 
         function showQuestion() {
